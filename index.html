@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prontuário Emagrecimento</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
       background-color: #f2f2f2;
+      padding: 20px;
     }
     h2 {
       color: #2c3e50;
@@ -25,19 +25,22 @@
       border: 1px solid #ccc;
     }
     button {
+      margin-top: 20px;
       padding: 10px 20px;
-      margin-top: 15px;
-      background-color: #219150;
+      background-color: #27ae60;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
+    button:hover {
+      background-color: #219150;
+    }
     .resumo {
       background-color: white;
       padding: 20px;
       border-radius: 10px;
-      margin-top: 20px;
+      margin-top: 30px;
     }
   </style>
 </head>
@@ -45,58 +48,59 @@
   <h2>📋 Ficha de Acompanhamento - Emagrecimento</h2>
   <form id="formulario">
     <label>Nome:</label>
-    <input type="text" name="nome" required />
-    
+    <input type="text" name="nome" required>
+
     <label>Sexo:</label>
     <select name="sexo">
       <option value="masculino">Masculino</option>
       <option value="feminino">Feminino</option>
     </select>
-    
+
     <label>Idade:</label>
-    <input type="number" name="idade" />
-    
-    <label>Peso (kg):</label>
-    <input type="number" name="peso" />
-    
+    <input type="number" name="idade" required>
+
+    <label>Peso Atual (kg):</label>
+    <input type="number" name="peso" step="0.1" required>
+
     <label>Altura (cm):</label>
-    <input type="number" name="altura" />
-    
-    <label>Objetivo:</label>
-    <textarea name="objetivo"></textarea>
-    
-    <button type="submit">Gerar Resumo</button>
+    <input type="number" name="altura" required>
+
+    <label>Circunferência Abdominal (cm):</label>
+    <input type="number" name="cintura">
+
+    <label>Pressão Arterial:</label>
+    <input type="text" name="pressao">
+
+    <label>Medicações em uso:</label>
+    <textarea name="medicacoes"></textarea>
+
+    <label>Exames Recentes:</label>
+    <textarea name="exames"></textarea>
+
+    <label>Observações:</label>
+    <textarea name="observacoes"></textarea>
+
+    <button type="submit">📤 Gerar PDF e Enviar</button>
   </form>
-  
-  <div class="resumo" id="resumo" style="display:none;"></div>
 
   <script>
     document.getElementById('formulario').addEventListener('submit', function(e) {
       e.preventDefault();
-      const form = e.target;
-      const nome = form.nome.value;
-      const sexo = form.sexo.value;
-      const idade = form.idade.value;
-      const peso = form.peso.value;
-      const altura = form.altura.value;
-      const objetivo = form.objetivo.value;
+      const dados = new FormData(this);
+      let texto = '📋 Ficha de Acompanhamento - Emagrecimento\n\n';
+      for (const [chave, valor] of dados.entries()) {
+        texto += `${chave.charAt(0).toUpperCase() + chave.slice(1)}: ${valor}\n`;
+      }
 
-      const resumo = `
-        <h3>Resumo do Paciente</h3>
-        <p><strong>Nome:</strong> ${nome}</p>
-        <p><strong>Sexo:</strong> ${sexo}</p>
-        <p><strong>Idade:</strong> ${idade}</p>
-        <p><strong>Peso:</strong> ${peso} kg</p>
-        <p><strong>Altura:</strong> ${altura} cm</p>
-        <p><strong>Objetivo:</strong> ${objetivo}</p>
-      `;
+      // Criação do PDF
+      const blob = new Blob([texto], { type: 'application/pdf' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `ficha_${dados.get('nome')}.pdf`;
+      link.click();
 
-      const div = document.getElementById('resumo');
-      div.innerHTML = resumo;
-      div.style.display = 'block';
+      alert('📄 PDF gerado com sucesso!');
     });
   </script>
 </body>
 </html>
-
-
