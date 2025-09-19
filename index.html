@@ -1,105 +1,164 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Prontuário Emagrecimento</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f2f2f2;
       padding: 20px;
+      color: #333;
     }
     h2 {
       color: #2c3e50;
+      margin-bottom: 10px;
     }
     label {
-      display: block;
       margin-top: 10px;
+      display: block;
+      font-weight: bold;
     }
     input, select, textarea {
       width: 100%;
-      padding: 10px;
+      padding: 8px;
       margin-top: 5px;
-      border-radius: 5px;
       border: 1px solid #ccc;
+      border-radius: 4px;
     }
     button {
       margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #27ae60;
-      color: white;
+      padding: 10px 16px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: #fff;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
     button:hover {
-      background-color: #219150;
+      background-color: #2980b9;
     }
     .resumo {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      margin-top: 30px;
+      background: white;
+      padding: 15px;
+      margin-top: 25px;
+      border-radius: 8px;
+    }
+    #logo {
+      width: 180px;
+      margin-bottom: 15px;
     }
   </style>
 </head>
 <body>
-  <h2>📋 Ficha de Acompanhamento - Emagrecimento</h2>
+  <img id="logo" src="https://raw.githubusercontent.com/drjlasantos-ctrl/prontuario-eletronico/main/logo.png" alt="Logo" />
+  <h2>Prontuário de Emagrecimento</h2>
   <form id="formulario">
     <label>Nome:</label>
-    <input type="text" name="nome" required>
-
-    <label>Sexo:</label>
-    <select name="sexo">
-      <option value="masculino">Masculino</option>
-      <option value="feminino">Feminino</option>
+    <input type="text" name="nome" required />
+    
+    <label>Semana:</label>
+    <select name="semana">
+      <option value="">Selecione</option>
+      <option>Semana 1</option><option>Semana 2</option><option>Semana 3</option><option>Semana 4</option>
+      <option>Semana 5</option><option>Semana 6</option><option>Semana 7</option><option>Semana 8</option>
+      <option>Semana 9</option><option>Semana 10</option>
     </select>
 
-    <label>Idade:</label>
-    <input type="number" name="idade" required>
-
-    <label>Peso Atual (kg):</label>
-    <input type="number" name="peso" step="0.1" required>
+    <label>Peso (kg):</label>
+    <input type="number" name="peso" id="peso" required />
 
     <label>Altura (cm):</label>
-    <input type="number" name="altura" required>
+    <input type="number" name="altura" id="altura" required />
 
-    <label>Circunferência Abdominal (cm):</label>
-    <input type="number" name="cintura">
+    <label>IMC:</label>
+    <input type="text" id="imc" disabled />
 
-    <label>Pressão Arterial:</label>
-    <input type="text" name="pressao">
+    <label>Cintura (cm):</label>
+    <input type="number" name="cintura" />
 
-    <label>Medicações em uso:</label>
-    <textarea name="medicacoes"></textarea>
+    <label>Pressão arterial:</label>
+    <input type="text" name="pressao" />
 
-    <label>Exames Recentes:</label>
-    <textarea name="exames"></textarea>
+    <label>Frequência cardíaca:</label>
+    <input type="text" name="frequencia" />
 
     <label>Observações:</label>
     <textarea name="observacoes"></textarea>
 
-    <button type="submit">📤 Gerar PDF e Enviar</button>
+    <button type="submit">Salvar e Enviar</button>
+    <button type="button" onclick="window.print()">🖨️ Imprimir</button>
+    <button type="button" onclick="compartilharWhatsApp()">📲 Compartilhar no WhatsApp</button>
   </form>
 
+  <div class="resumo" id="resumo" style="display:none;"></div>
+
   <script>
-    document.getElementById('formulario').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const dados = new FormData(this);
-      let texto = '📋 Ficha de Acompanhamento - Emagrecimento\n\n';
-      for (const [chave, valor] of dados.entries()) {
-        texto += `${chave.charAt(0).toUpperCase() + chave.slice(1)}: ${valor}\n`;
+    const form = document.getElementById("formulario");
+    const imcField = document.getElementById("imc");
+    const pesoInput = document.getElementById("peso");
+    const alturaInput = document.getElementById("altura");
+    const resumoDiv = document.getElementById("resumo");
+
+    function calcularIMC() {
+      const peso = parseFloat(pesoInput.value);
+      const altura = parseFloat(alturaInput.value) / 100;
+      if (!isNaN(peso) && !isNaN(altura) && altura > 0) {
+        const imc = peso / (altura * altura);
+        let classificacao = "";
+        if (imc < 18.5) classificacao = "Magreza";
+        else if (imc < 24.9) classificacao = "Normal";
+        else if (imc < 29.9) classificacao = "Sobrepeso";
+        else if (imc < 34.9) classificacao = "Obesidade I";
+        else if (imc < 39.9) classificacao = "Obesidade II";
+        else classificacao = "Obesidade III";
+        imcField.value = `${imc.toFixed(1)} (${classificacao})`;
+      } else {
+        imcField.value = "";
       }
+    }
 
-      // Criação do PDF
-      const blob = new Blob([texto], { type: 'application/pdf' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `ficha_${dados.get('nome')}.pdf`;
-      link.click();
+    pesoInput.addEventListener("input", calcularIMC);
+    alturaInput.addEventListener("input", calcularIMC);
 
-      alert('📄 PDF gerado com sucesso!');
+    function compartilharWhatsApp() {
+      const nome = form.nome.value;
+      const semana = form.semana.value;
+      const imc = imcField.value;
+      const msg = `Consulta ${semana} - Paciente: ${nome}\\nIMC: ${imc}`;
+      const link = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+      window.open(link, "_blank");
+    }
+
+    form.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const data = new FormData(form);
+      const json = {};
+      data.forEach((value, key) => json[key] = value);
+
+      let resumo = `<h3>Resumo da Consulta</h3><ul>`;
+      for (const [k, v] of Object.entries(json)) {
+        resumo += `<li><strong>${k}:</strong> ${v}</li>`;
+      }
+      resumo += `<li><strong>IMC:</strong> ${imcField.value}</li></ul>`;
+      resumoDiv.innerHTML = resumo;
+      resumoDiv.style.display = 'block';
+
+      try {
+        await fetch("https://script.google.com/macros/s/AKfycbz726bRq3cHtWOn4473KzD--dpj4Soih8FKgZVKmSi4oCJxHMjvfHYWmuWReh2RCfCYsQ/exec", {
+          method: "POST",
+          body: JSON.stringify({...json, imc: imcField.value}),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+        alert("✅ Dados enviados com sucesso ao Google Drive!");
+      } catch (err) {
+        alert("❌ Erro ao enviar os dados para o Drive.");
+        console.error(err);
+      }
     });
   </script>
 </body>
