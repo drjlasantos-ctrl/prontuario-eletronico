@@ -46,7 +46,7 @@
   </style>
 </head>
 <body>
-  <h2>Ficha de Acompanhamento - Emagrecimento</h2>
+  <h2>📋 Ficha de Acompanhamento - Emagrecimento</h2>
   <form id="formulario">
     <label>Nome:</label><input type="text" name="nome">
     <label>Sexo:</label>
@@ -63,36 +63,45 @@
     <label>Bíceps Esquerdo (cm):</label><input type="number" name="biceps_e">
     <label>Frequência Cardíaca:</label><input type="number" name="fc">
     <label>Pressão Arterial:</label><input type="text" name="pa">
+    <label>Data da próxima consulta:</label><input type="date" name="proxima">
     <label>Observação:</label><textarea name="observacao"></textarea>
-    <button type="button" onclick="gerarResumo()">Finalizar Consulta</button>
+    <label>Foto do paciente:</label><input type="file" accept="image/*" id="fotoPaciente">
+    <button type="button" onclick="gerarResumo()">✅ Finalizar Consulta</button>
   </form>  <div id="resumo" style="display:none;"></div>
   <div id="acoes" style="display:none;">
-    <button onclick="baixarPDF()">Baixar PDF</button>
-    <button onclick="enviarWhatsApp()">Enviar por WhatsApp</button>
+    <button onclick="baixarPDF()">📄 Baixar PDF</button>
+    <button onclick="salvarNoDrive()">💾 Salvar no Drive</button>
+    <button onclick="enviarWhatsApp()">📲 Enviar por WhatsApp</button>
   </div>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <script>
+    const { jsPDF } = window.jspdf;
     const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAgAElEQVR4n...";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzZRijSZa6XgMi_C4pHlKMIUc0oNmK2NKo3iNe9ensZlxUuXIxezfORCEb6Aw0yOjzq/exec";
+    const DRIVE_FOLDER_ID = "1-ZLwdv_thQtBe2JBc_f90P2x0nOmI4UU";
+
     let dados = {};
+    let fotoBase64 = "";
+
+    document.getElementById('fotoPaciente').addEventListener('change', function (e) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        fotoBase64 = reader.result;
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    });
 
     function gerarResumo() {
       const form = document.getElementById('formulario');
       dados = Object.fromEntries(new FormData(form));
       const alturaM = parseFloat(dados.altura) / 100;
       const imc = (dados.peso && alturaM) ? (dados.peso / (alturaM * alturaM)).toFixed(2) : "-";
-
       const resumo = `
-        <h3>Resumo da Consulta</h3>
-        <p><strong>Nome:</strong> ${dados.nome}</p>
-        <p><strong>Sexo:</strong> ${dados.sexo}</p>
-        <p><strong>Idade:</strong> ${dados.idade}</p>
-        <p><strong>Peso:</strong> ${dados.peso} kg</p>
-        <p><strong>Altura:</strong> ${dados.altura} cm</p>
-        <p><strong>IMC:</strong> ${imc}</p>
-        <p><strong>Cintura:</strong> ${dados.cintura} cm</p>
-        <p><strong>Tórax:</strong> ${dados.torax} cm</p>
-        <p><strong>Bíceps D:</strong> ${dados.biceps_d} cm</p>
-        <p><strong>Bíceps E:</strong> ${dados.biceps_e} cm</p>
-        <p><strong>FC:</strong> ${dados.fc}</p>
-        <p><strong>PA:</strong> ${dados.pa}</p>
+        <h3>📝 Resumo da Consulta</h3>
+        <p><strong>Nome:</strong> ${dados.nome} | <strong>Sexo:</strong> ${dados.sexo} | <strong>Idade:</strong> ${dados.idade}</p>
+        <p><strong>Peso:</strong> ${dados.peso} kg | <strong>Altura:</strong> ${dados.altura} cm | <strong>IMC:</strong> ${imc}</p>
+        <p><strong>Cintura:</strong> ${dados.cintura} cm | <strong>Tórax:</strong> ${dados.torax} cm</p>
+        <p><strong>Bíceps D:</strong> ${dados.biceps_d} cm | <strong>Bíceps E:</strong> ${dados.biceps_e} cm</p>
+        <p><strong>FC:</strong> ${dados.fc} | <strong>PA:</strong> ${dados.pa}</p>
+        <p><strong>Próxima Consulta:</strong> ${dados.proxima}</p>
         <p><strong>Observação:</strong> ${dados.observacao}</p>
       `;
       document.getElementById('resumo').innerHTML = resumo;
@@ -100,16 +109,22 @@
       document.getElementById('acoes').style.display = 'flex';
     }
 
-    async function baixarPDF() {
-      const { jsPDF } = window.jspdf;
+    async function gerarPDF() {
       const doc = new jsPDF();
       const alturaM = parseFloat(dados.altura) / 100;
       const imc = (dados.peso && alturaM) ? (dados.peso / (alturaM * alturaM)).toFixed(2) : "-";
 
       const logo = new Image();
       logo.src = LOGO_BASE64;
-      await new Promise(resolve => { logo.onload = resolve; });
-      doc.addImage(logo, 'PNG', 30, 40, 150, 150);
+      await new Promise(resolve => logo.onload = resolve);
+      doc.addImage(logo, 'PNG', 30, 20, 150, 50);
+
+      if (fotoBase64) {
+        const foto = new Image();
+        foto.src = fotoBase64;
+        await new Promise(resolve => foto.onload = resolve);
+        doc.addImage(foto, 'JPEG', 150, 80, 40, 40);
+      }
 
       doc.setFontSize(12);
       doc.text(`Paciente: ${dados.nome}
@@ -120,13 +135,33 @@ Altura: ${dados.altura} cm
 IMC: ${imc}
 Cintura: ${dados.cintura} cm
 Tórax: ${dados.torax} cm
-Bíceps Direito: ${dados.biceps_d} cm
-Bíceps Esquerdo: ${dados.biceps_e} cm
-Frequência Cardíaca: ${dados.fc}
-Pressão Arterial: ${dados.pa}
-Observação: ${dados.observacao}`, 15, 220);
+Bíceps D: ${dados.biceps_d} cm
+Bíceps E: ${dados.biceps_e} cm
+FC: ${dados.fc}
+PA: ${dados.pa}
+Próxima Consulta: ${dados.proxima}
+Observação: ${dados.observacao}`, 10, 140);
 
+      return doc;
+    }
+
+    async function baixarPDF() {
+      const doc = await gerarPDF();
       doc.save(`Ficha_${dados.nome}.pdf`);
+    }
+
+    async function salvarNoDrive() {
+      const doc = await gerarPDF();
+      const pdfBase64 = btoa(doc.output());
+      fetch(GAS_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          nomePaciente: dados.nome,
+          semana: new Date().toISOString().split('T')[0],
+          pdfBase64,
+          folderId: DRIVE_FOLDER_ID
+        })
+      }).then(() => alert("Enviado ao Google Drive!"));
     }
 
     function enviarWhatsApp() {
@@ -141,11 +176,11 @@ Observação: ${dados.observacao}`, 15, 220);
         `IMC: ${imc}%0A` +
         `Cintura: ${dados.cintura} cm%0A` +
         `Tórax: ${dados.torax} cm%0A` +
-        `Bíceps Direito: ${dados.biceps_d} cm%0A` +
-        `Bíceps Esquerdo: ${dados.biceps_e} cm%0A` +
+        `Bíceps D: ${dados.biceps_d} cm%0A` +
+        `Bíceps E: ${dados.biceps_e} cm%0A` +
         `FC: ${dados.fc}%0A` +
-        `PA: ${dados.pa}`;
-
+        `PA: ${dados.pa}%0A` +
+        `📅 Próxima consulta: ${dados.proxima}`;
       window.open(`https://wa.me/?text=${texto}`, '_blank');
     }
   </script></body>
