@@ -5,29 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prontuário Emagrecimento</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
       padding: 20px;
       background-color: #f2f2f2;
+      color: #333;
     }
-    label { display: block; margin-top: 10px; }
+    h2 {
+      text-align: center;
+      color: #007b5f;
+    }
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    label {
+      margin-top: 10px;
+      display: block;
+      font-weight: bold;
+    }
     input, select, textarea {
-      width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc;
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1em;
     }
     button {
-      padding: 10px 20px;
-      margin: 10px 5px 0 0;
+      padding: 12px 20px;
+      margin: 15px 5px 0 0;
       background-color: #007b5f;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
+      font-size: 1em;
       cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #005f49;
     }
     #resumo {
       background-color: white;
       padding: 20px;
       border-radius: 10px;
       margin-top: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    #acoes {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    @media (min-width: 600px) {
+      #acoes {
+        flex-direction: row;
+      }
     }
   </style>
 </head>
@@ -62,7 +104,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
-    const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAgAElEQVR4n..."; // substitua pelo seu base64 real
+    const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAgAElEQVR4n...";
     const GAS_URL = "https://script.google.com/macros/s/AKfycbz726bRq3cHtWOn4473KzD--dpj4Soih8FKgZVKmSi4oCJxHMjvfHYWmuWReh2RCfCYsQ/exec";
     const DRIVE_FOLDER_ID = "1-ZLwdv_thQtBe2JBc_f90P2x0nOmI4UU";
     let dados = {};
@@ -91,7 +133,7 @@
       `;
       document.getElementById('resumo').innerHTML = resumo;
       document.getElementById('resumo').style.display = 'block';
-      document.getElementById('acoes').style.display = 'block';
+      document.getElementById('acoes').style.display = 'flex';
     }
 
     async function gerarPDF() {
@@ -124,11 +166,19 @@ Observação: ${dados.observacao}`, 10, 220);
     }
 
     async function baixarPDF() {
+      if (!dados || !dados.nome) {
+        alert("Gere o resumo antes de salvar o PDF.");
+        return;
+      }
       const doc = await gerarPDF();
       doc.save(`Ficha_${dados.nome}.pdf`);
     }
 
     async function enviarGoogleDrive() {
+      if (!dados || !dados.nome) {
+        alert("Gere o resumo antes de salvar no Drive.");
+        return;
+      }
       const doc = await gerarPDF();
       const pdfBase64 = btoa(doc.output());
       fetch(GAS_URL, {
@@ -143,6 +193,10 @@ Observação: ${dados.observacao}`, 10, 220);
     }
 
     function enviarWhatsApp() {
+      if (!dados || !dados.nome) {
+        alert("Gere o resumo antes de enviar pelo WhatsApp.");
+        return;
+      }
       const alturaM = parseFloat(dados.altura) / 100;
       const imc = (dados.peso && alturaM) ? (dados.peso / (alturaM * alturaM)).toFixed(2) : "-";
       const texto = `*Ficha de Acompanhamento*%0A
