@@ -16,8 +16,8 @@
     }
     button {
       padding: 10px 20px;
-      margin-top: 15px;
-      background-color: #219150;
+      margin: 10px 5px 0 0;
+      background-color: #007b5f;
       color: white;
       border: none;
       border-radius: 5px;
@@ -52,24 +52,28 @@
     <label>Observação:</label><textarea name="observacao"></textarea>
     <button type="button" onclick="gerarResumo()">Finalizar Consulta</button>
   </form>
-  <div id="resumo"></div>
-  <button id="btnSalvar" style="display:none" onclick="salvarImprimir()">Salvar/Imprimir PDF</button>
+
+  <div id="resumo" style="display:none;"></div>
+  <div id="acoes" style="display:none;">
+    <button onclick="baixarPDF()">Baixar PDF</button>
+    <button onclick="enviarGoogleDrive()">Salvar no Drive</button>
+    <button onclick="enviarWhatsApp()">Enviar por WhatsApp</button>
+  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
-    const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAgAElEQVR4nOzde3BU5Zk38EfJJq4ZiBZdSmDZlC3x6KPmb1iw4QHGsiE...";
-    const DRIVE_FOLDER_ID = "1-ZLwdv_thQtBe2JBc_f90P2x0nOmI4UU";
+    const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAgAElEQVR4n..."; // substitua pelo seu base64 real
     const GAS_URL = "https://script.google.com/macros/s/AKfycbz726bRq3cHtWOn4473KzD--dpj4Soih8FKgZVKmSi4oCJxHMjvfHYWmuWReh2RCfCYsQ/exec";
-
-    let dados;
+    const DRIVE_FOLDER_ID = "1-ZLwdv_thQtBe2JBc_f90P2x0nOmI4UU";
+    let dados = {};
 
     function gerarResumo() {
       const form = document.getElementById('formulario');
       dados = Object.fromEntries(new FormData(form));
       const alturaM = parseFloat(dados.altura) / 100;
-      const imc = dados.peso && alturaM ? (dados.peso / (alturaM * alturaM)).toFixed(2) : "-";
+      const imc = (dados.peso && alturaM) ? (dados.peso / (alturaM * alturaM)).toFixed(2) : "-";
 
-      const html = `
+      const resumo = `
         <h3>Resumo da Consulta</h3>
         <p><strong>Nome:</strong> ${dados.nome}</p>
         <p><strong>Sexo:</strong> ${dados.sexo}</p>
@@ -79,35 +83,53 @@
         <p><strong>IMC:</strong> ${imc}</p>
         <p><strong>Cintura:</strong> ${dados.cintura} cm</p>
         <p><strong>Tórax:</strong> ${dados.torax} cm</p>
-        <p><strong>Bíceps Direito:</strong> ${dados.biceps_d} cm</p>
-        <p><strong>Bíceps Esquerdo:</strong> ${dados.biceps_e} cm</p>
-        <p><strong>Frequência Cardíaca:</strong> ${dados.fc}</p>
-        <p><strong>Pressão Arterial:</strong> ${dados.pa}</p>
+        <p><strong>Bíceps D:</strong> ${dados.biceps_d} cm</p>
+        <p><strong>Bíceps E:</strong> ${dados.biceps_e} cm</p>
+        <p><strong>FC:</strong> ${dados.fc}</p>
+        <p><strong>PA:</strong> ${dados.pa}</p>
         <p><strong>Observação:</strong> ${dados.observacao}</p>
       `;
-      document.getElementById('resumo').innerHTML = html;
-      document.getElementById('btnSalvar').style.display = "inline-block";
+      document.getElementById('resumo').innerHTML = resumo;
+      document.getElementById('resumo').style.display = 'block';
+      document.getElementById('acoes').style.display = 'block';
     }
 
-    async function salvarImprimir() {
+    async function gerarPDF() {
       const { jsPDF } = window.jspdf;
-      const alturaM = parseFloat(dados.altura) / 100;
-      const imc = dados.peso && alturaM ? (dados.peso / (alturaM * alturaM)).toFixed(2) : "-";
       const doc = new jsPDF();
+      const alturaM = parseFloat(dados.altura) / 100;
+      const imc = (dados.peso && alturaM) ? (dados.peso / (alturaM * alturaM)).toFixed(2) : "-";
 
       const logo = new Image();
       logo.src = LOGO_BASE64;
-      await new Promise(resolve => {
-        logo.onload = () => {
-          doc.addImage(logo, 'PNG', 15, 40, 180, 180);
-          resolve();
-        };
-      });
+      await new Promise(resolve => { logo.onload = resolve; });
 
+      doc.addImage(logo, 'PNG', 15, 30, 180, 180);
       doc.setFontSize(12);
-      doc.text(`Paciente: ${dados.nome}\nIdade: ${dados.idade}\nSexo: ${dados.sexo}\nPeso: ${dados.peso} kg\nAltura: ${dados.altura} cm\nIMC: ${imc}\nCintura: ${dados.cintura} cm\nTórax: ${dados.torax} cm\nBíceps D: ${dados.biceps_d} cm\nBíceps E: ${dados.biceps_e} cm\nFrequência Cardíaca: ${dados.fc}\nPressão Arterial: ${dados.pa}\nObservação: ${dados.observacao}`, 10, 20);
-      doc.save(`Ficha_${dados.nome}.pdf`);
+      doc.text(`Paciente: ${dados.nome}
+Idade: ${dados.idade}
+Sexo: ${dados.sexo}
+Peso: ${dados.peso} kg
+Altura: ${dados.altura} cm
+IMC: ${imc}
+Cintura: ${dados.cintura} cm
+Tórax: ${dados.torax} cm
+Bíceps Direito: ${dados.biceps_d} cm
+Bíceps Esquerdo: ${dados.biceps_e} cm
+Frequência Cardíaca: ${dados.fc}
+Pressão Arterial: ${dados.pa}
+Observação: ${dados.observacao}`, 10, 220);
 
+      return doc;
+    }
+
+    async function baixarPDF() {
+      const doc = await gerarPDF();
+      doc.save(`Ficha_${dados.nome}.pdf`);
+    }
+
+    async function enviarGoogleDrive() {
+      const doc = await gerarPDF();
       const pdfBase64 = btoa(doc.output());
       fetch(GAS_URL, {
         method: "POST",
@@ -117,14 +139,19 @@
           pdfBase64,
           folderId: DRIVE_FOLDER_ID
         })
-      });
+      }).then(() => alert("Enviado para o Google Drive!"));
+    }
 
-      const msg = `*Ficha de Emagrecimento*%0A
+    function enviarWhatsApp() {
+      const alturaM = parseFloat(dados.altura) / 100;
+      const imc = (dados.peso && alturaM) ? (dados.peso / (alturaM * alturaM)).toFixed(2) : "-";
+      const texto = `*Ficha de Acompanhamento*%0A
 Nome: ${dados.nome}%0ASexo: ${dados.sexo}%0AIdade: ${dados.idade}%0APeso: ${dados.peso} kg%0AAltura: ${dados.altura} cm%0AIMC: ${imc}%0ACintura: ${dados.cintura} cm%0ATórax: ${dados.torax} cm%0ABíceps D: ${dados.biceps_d} cm%0ABíceps E: ${dados.biceps_e} cm%0AFC: ${dados.fc}%0APA: ${dados.pa}`;
-      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+      window.open(`https://wa.me/?text=${texto}`);
     }
   </script>
 </body>
 </html>
+
 
 
