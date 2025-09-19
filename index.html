@@ -54,7 +54,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
-    const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAYACAYAAADogjqqAACgGGNhQlgAAKAYanVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAANw9qdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOmQ4Y2VhMDI1LWVjYT...SU5ErkJggg=="; // encurtado aqui
+    const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAYACAYAAADogjqqAACgGGNhQlgAAKAYanVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAANw9qdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOmQ4Y2VhMDI1LWVjYT...SU5ErkJggg=="; // encurtado
     const DRIVE_FOLDER_ID = "1-ZLwdv_thQtBe2JBc_f90P2x0nOmI4UU";
     const GAS_URL = "https://script.google.com/macros/s/AKfycbz726bRq3cHtWOn4473KzD--dpj4Soih8FKgZVKmSi4oCJxHMjvfHYWmuWReh2RCfCYsQ/exec";
 
@@ -77,10 +77,11 @@
       });
 
       doc.setFontSize(12);
-      doc.text(`Paciente: ${data.nome}\nIdade: ${data.idade}\nSexo: ${data.sexo}\nPeso: ${data.peso} kg\nAltura: ${data.altura} cm\nIMC: ${imc}\nCintura: ${data.cintura} cm\nTórax: ${data.torax} cm\nBíceps Dir.: ${data.biceps_d} cm\nBíceps Esq.: ${data.biceps_e} cm`, 10, 20);
+      doc.text(`Paciente: ${data.nome}\nIdade: ${data.idade}\nSexo: ${data.sexo}\nPeso: ${data.peso} kg\nAltura: ${data.altura} cm\nIMC: ${imc}\nCintura: ${data.cintura} cm\nTórax: ${data.torax} cm\nBíceps Dir.: ${data.biceps_d} cm\nBíceps Esq.: ${data.biceps_e} cm\nObservação: ${data.observacao}`, 10, 20);
+
+      doc.save(`Ficha_${data.nome}.pdf`);
 
       const pdfBase64 = btoa(doc.output());
-
       fetch(GAS_URL, {
         method: "POST",
         body: JSON.stringify({
@@ -94,8 +95,6 @@
       const msg = `*Ficha de Emagrecimento*%0A
 Nome: ${data.nome}%0ASexo: ${data.sexo}%0AIdade: ${data.idade}%0APeso: ${data.peso} kg%0AAltura: ${data.altura} cm%0AIMC: ${imc}%0ACintura: ${data.cintura} cm%0ATórax: ${data.torax} cm%0ABíceps D: ${data.biceps_d} cm%0ABíceps E: ${data.biceps_e} cm`;
       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
-
-      alert("Consulta finalizada. PDF enviado e WhatsApp aberto.");
     }
   </script>
 </body>
