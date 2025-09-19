@@ -1,128 +1,102 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Prontuário de Emagrecimento</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prontuário Emagrecimento</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
       padding: 20px;
+      background-color: #f2f2f2;
     }
-    @media print {
-      body::before {
-        content: "";
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        right: 20px;
-        bottom: 20px;
-        background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABpYAAAKWCAMAAADLTySgAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAANJUExURQAAAJqamqioqK+vr6enp52dnZ6enq6urqampqSkpJGRkZOTk5qampubm6+vr4qKipmZmZqampycnKCgoK+vr6Ojo5qamp2dnZ2dnZ6enq6urqSkpJ+fn5eXl6Ojo5mZmZOTk5aWlqWlpaWlpaSkpKOjo52dnZ6enqWlpaOjo6urq6enp52dnZ+fn6urq6ioqKOjo52dnZOTk52dnZycnKOjo52dnZOTk6urq52dnZOTk6Ojo5qampOTk6Ojo5OTk5eXl5OTk5mZmZ6enqSkpJ+fn5ubm5eXl5ubm5aWlqKioqSkpJOTk5mZmZubm6+vr5ubm5eXl6ioqK+vr6amprCwsMHBwby8vKioqK+vr7GxscPDw8TExJubm+fn5+Hh4fDw8LGxsbCwsJ+fn7CwsLCwsLu7u8TExLy8vLS0tLe3t7q6usTExKOjo4+Pj8fHx+np6fHx8Z+fn+Tk5N/f39ra2vT09Nra2uTk5OHh4bu7u6ampqWlpa+vr6+vr6Ojo+Xl5eDg4Pr6+uHh4e/v7/Hx8ezs7OHh4efn5+vr6+fn5+jo6Ozs7OXl5e/v7+vr6+fn5+zs7Obm5ubm5urq6uTk5Obm5unp6eTk5N/f39/f39bW1uPj4/X19e/v7+bm5ubm5vDw8Pf39/Dw8N7e3ujo6Pf39+bm5u7u7u3t7eLi4uHh4e/v7+bm5uzs7Ovr6+Tk5OHh4eDg4O/v7+bm5vLy8vDw8Ovr6+Pj4+Dg4Ofn5+bm5vr6+vLy8ubm5uDg4PDw8Pf39+7u7ufn5+fn5+7u7u3t7eHh4ejo6PDw8Pr6+uDg4OHh4fDw8P///yHyo7wAAAKkdFJOU///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8AYKLc9AAAAAFdFJOU/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8AvvqujQAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAAd0SU1FB+UGFRo3Fb7p5dIAAACeSURBVHja7dRBDsMgDEXRd6KMGYTG+c8uhXweDTn1eSRyJhD6abdm6MXuGAAAAAAAAAAAAAAAAAADgvwXzp+oYk+EKVVPUuYcq1KpVuXKtpyoql8+yKrcr1Xz7Iqt+JxfLKqx1Xz7Ir9Wf5/bPXsTe2qlUvlg29rrcr1eDJu+OyaHqcKpVqE+q9j++ut6Vw2+jrxV8cWVVPUmfdYvAAAAAAAAAAAAAAAAAADgf/0F03XMWOs9zkcAAAAASUVORK5CYII=') no-repeat center center;
-        background-size: 300px;
-        opacity: 0.1;
-        z-index: -1;
-      }
-    }
-    form {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
+    label { display: block; margin-top: 10px; }
     input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc;
     }
     button {
-      margin-top: 10px;
-      padding: 10px;
-      background-color: #007BFF;
-      color: #fff;
+      padding: 10px 20px;
+      margin-top: 15px;
+      background-color: #219150;
+      color: white;
       border: none;
       border-radius: 5px;
+      cursor: pointer;
+    }
+    #resumo {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h2>Prontuário de Emagrecimento</h2>
+  <h2>Ficha de Acompanhamento - Emagrecimento</h2>
   <form id="formulario">
-    <label>Nome do paciente:</label>
-    <input type="text" name="nome" required>
-    <label>Semana:</label>
-    <select name="semana" required>
-      <option value="">Selecione</option>
-      <option>Semana 1</option><option>Semana 2</option><option>Semana 3</option>
-      <option>Semana 4</option><option>Semana 5</option><option>Semana 6</option>
-      <option>Semana 7</option><option>Semana 8</option><option>Semana 9</option>
-      <option>Semana 10</option>
+    <label>Nome:</label><input type="text" name="nome">
+    <label>Sexo:</label>
+    <select name="sexo">
+      <option value="masculino">Masculino</option>
+      <option value="feminino">Feminino</option>
     </select>
-    <label>Peso (kg):</label><input type="number" name="peso" id="peso" required>
-    <label>Altura (cm):</label><input type="number" name="altura" id="altura" required>
-    <label>IMC:</label><input type="text" id="imc" disabled>
-    <label>Circunferência da cintura (cm):</label><input type="number" name="cintura">
-    <label>Circunferência do tórax (cm):</label><input type="number" name="torax">
-    <label>Bíceps direito (cm):</label><input type="number" name="biceps_d">
-    <label>Bíceps esquerdo (cm):</label><input type="number" name="biceps_e">
-    <label>Pressão arterial:</label><input type="text" name="pressao">
-    <label>Frequência cardíaca:</label><input type="text" name="frequencia">
-    <label>Observações:</label><textarea name="obs"></textarea>
-
-    <button type="submit">Salvar e Enviar</button>
-    <button type="button" onclick="window.print()">Imprimir</button>
-    <button type="button" onclick="compartilhar()">Compartilhar no WhatsApp</button>
+    <label>Idade:</label><input type="number" name="idade">
+    <label>Peso (kg):</label><input type="number" step="0.1" name="peso">
+    <label>Altura (cm):</label><input type="number" step="0.1" name="altura">
+    <label>Cintura (cm):</label><input type="number" name="cintura">
+    <label>Tórax (cm):</label><input type="number" name="torax">
+    <label>Bíceps Direito (cm):</label><input type="number" name="biceps_d">
+    <label>Bíceps Esquerdo (cm):</label><input type="number" name="biceps_e">
+    <label>Observação:</label><textarea name="observacao"></textarea>
+    <button type="button" onclick="gerarPDF()">Finalizar Consulta</button>
   </form>
+  <div id="resumo"></div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
-    const peso = document.getElementById('peso');
-    const altura = document.getElementById('altura');
-    const imc = document.getElementById('imc');
+    const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAYACAYAAADogjqqAACgGGNhQlgAAKAYanVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAANw9qdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOmQ4Y2VhMDI1LWVjYT...SU5ErkJggg=="; // encurtado aqui
+    const DRIVE_FOLDER_ID = "1-ZLwdv_thQtBe2JBc_f90P2x0nOmI4UU";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbz726bRq3cHtWOn4473KzD--dpj4Soih8FKgZVKmSi4oCJxHMjvfHYWmuWReh2RCfCYsQ/exec";
 
-    function calcularIMC() {
-      const p = parseFloat(peso.value);
-      const a = parseFloat(altura.value) / 100;
-      if (!isNaN(p) && !isNaN(a) && a > 0) {
-        const resultado = p / (a * a);
-        let classificacao = '';
-        if (resultado < 18.5) classificacao = 'Magreza';
-        else if (resultado < 24.9) classificacao = 'Normal';
-        else if (resultado < 29.9) classificacao = 'Sobrepeso';
-        else if (resultado < 34.9) classificacao = 'Obesidade I';
-        else if (resultado < 39.9) classificacao = 'Obesidade II';
-        else classificacao = 'Obesidade III';
-        imc.value = resultado.toFixed(1) + " (" + classificacao + ")";
-      } else {
-        imc.value = "";
-      }
+    async function gerarPDF() {
+      const { jsPDF } = window.jspdf;
+      const form = document.getElementById('formulario');
+      const data = Object.fromEntries(new FormData(form));
+      const altura = parseFloat(data.altura) / 100;
+      const imc = data.peso && altura ? (data.peso / (altura * altura)).toFixed(2) : "-";
+
+      const doc = new jsPDF();
+
+      const logo = new Image();
+      logo.src = LOGO_BASE64;
+      await new Promise(resolve => {
+        logo.onload = () => {
+          doc.addImage(logo, 'PNG', 15, 40, 180, 180);
+          resolve();
+        };
+      });
+
+      doc.setFontSize(12);
+      doc.text(`Paciente: ${data.nome}\nIdade: ${data.idade}\nSexo: ${data.sexo}\nPeso: ${data.peso} kg\nAltura: ${data.altura} cm\nIMC: ${imc}\nCintura: ${data.cintura} cm\nTórax: ${data.torax} cm\nBíceps Dir.: ${data.biceps_d} cm\nBíceps Esq.: ${data.biceps_e} cm`, 10, 20);
+
+      const pdfBase64 = btoa(doc.output());
+
+      fetch(GAS_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          nomePaciente: data.nome,
+          semana: new Date().toISOString().split('T')[0],
+          pdfBase64,
+          folderId: DRIVE_FOLDER_ID
+        })
+      });
+
+      const msg = `*Ficha de Emagrecimento*%0A
+Nome: ${data.nome}%0ASexo: ${data.sexo}%0AIdade: ${data.idade}%0APeso: ${data.peso} kg%0AAltura: ${data.altura} cm%0AIMC: ${imc}%0ACintura: ${data.cintura} cm%0ATórax: ${data.torax} cm%0ABíceps D: ${data.biceps_d} cm%0ABíceps E: ${data.biceps_e} cm`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+
+      alert("Consulta finalizada. PDF enviado e WhatsApp aberto.");
     }
-
-    peso.addEventListener('input', calcularIMC);
-    altura.addEventListener('input', calcularIMC);
-
-    function compartilhar() {
-      const f = document.forms[0];
-      const dados = Array.from(f.elements)
-        .filter(el => el.name && el.name !== "obs")
-        .map(el => `${el.name}: ${el.value}`)
-        .join("\n");
-      const link = `https://wa.me/?text=${encodeURIComponent(dados)}`;
-      window.open(link, "_blank");
-    }
-
-    document.getElementById("formulario").addEventListener("submit", function(e) {
-      e.preventDefault();
-      alert("Consulta finalizada!");
-      window.print();
-    });
   </script>
 </body>
 </html>
