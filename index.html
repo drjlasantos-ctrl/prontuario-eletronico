@@ -47,24 +47,52 @@
     <label>Tórax (cm):</label><input type="number" name="torax">
     <label>Bíceps Direito (cm):</label><input type="number" name="biceps_d">
     <label>Bíceps Esquerdo (cm):</label><input type="number" name="biceps_e">
+    <label>Frequência Cardíaca:</label><input type="number" name="fc">
+    <label>Pressão Arterial:</label><input type="text" name="pa">
     <label>Observação:</label><textarea name="observacao"></textarea>
-    <button type="button" onclick="gerarPDF()">Finalizar Consulta</button>
+    <button type="button" onclick="gerarResumo()">Finalizar Consulta</button>
   </form>
   <div id="resumo"></div>
+  <button id="btnSalvar" style="display:none" onclick="salvarImprimir()">Salvar/Imprimir PDF</button>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
-    const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAYACAYAAADogjqqAACgGGNhQlgAAKAYanVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAANw9qdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOmQ4Y2VhMDI1LWVjYT...SU5ErkJggg=="; // encurtado
+    const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAgAElEQVR4nOzde3BU5Zk38EfJJq4ZiBZdSmDZlC3x6KPmb1iw4QHGsiE...";
     const DRIVE_FOLDER_ID = "1-ZLwdv_thQtBe2JBc_f90P2x0nOmI4UU";
     const GAS_URL = "https://script.google.com/macros/s/AKfycbz726bRq3cHtWOn4473KzD--dpj4Soih8FKgZVKmSi4oCJxHMjvfHYWmuWReh2RCfCYsQ/exec";
 
-    async function gerarPDF() {
-      const { jsPDF } = window.jspdf;
-      const form = document.getElementById('formulario');
-      const data = Object.fromEntries(new FormData(form));
-      const altura = parseFloat(data.altura) / 100;
-      const imc = data.peso && altura ? (data.peso / (altura * altura)).toFixed(2) : "-";
+    let dados;
 
+    function gerarResumo() {
+      const form = document.getElementById('formulario');
+      dados = Object.fromEntries(new FormData(form));
+      const alturaM = parseFloat(dados.altura) / 100;
+      const imc = dados.peso && alturaM ? (dados.peso / (alturaM * alturaM)).toFixed(2) : "-";
+
+      const html = `
+        <h3>Resumo da Consulta</h3>
+        <p><strong>Nome:</strong> ${dados.nome}</p>
+        <p><strong>Sexo:</strong> ${dados.sexo}</p>
+        <p><strong>Idade:</strong> ${dados.idade}</p>
+        <p><strong>Peso:</strong> ${dados.peso} kg</p>
+        <p><strong>Altura:</strong> ${dados.altura} cm</p>
+        <p><strong>IMC:</strong> ${imc}</p>
+        <p><strong>Cintura:</strong> ${dados.cintura} cm</p>
+        <p><strong>Tórax:</strong> ${dados.torax} cm</p>
+        <p><strong>Bíceps Direito:</strong> ${dados.biceps_d} cm</p>
+        <p><strong>Bíceps Esquerdo:</strong> ${dados.biceps_e} cm</p>
+        <p><strong>Frequência Cardíaca:</strong> ${dados.fc}</p>
+        <p><strong>Pressão Arterial:</strong> ${dados.pa}</p>
+        <p><strong>Observação:</strong> ${dados.observacao}</p>
+      `;
+      document.getElementById('resumo').innerHTML = html;
+      document.getElementById('btnSalvar').style.display = "inline-block";
+    }
+
+    async function salvarImprimir() {
+      const { jsPDF } = window.jspdf;
+      const alturaM = parseFloat(dados.altura) / 100;
+      const imc = dados.peso && alturaM ? (dados.peso / (alturaM * alturaM)).toFixed(2) : "-";
       const doc = new jsPDF();
 
       const logo = new Image();
@@ -77,15 +105,14 @@
       });
 
       doc.setFontSize(12);
-      doc.text(`Paciente: ${data.nome}\nIdade: ${data.idade}\nSexo: ${data.sexo}\nPeso: ${data.peso} kg\nAltura: ${data.altura} cm\nIMC: ${imc}\nCintura: ${data.cintura} cm\nTórax: ${data.torax} cm\nBíceps Dir.: ${data.biceps_d} cm\nBíceps Esq.: ${data.biceps_e} cm\nObservação: ${data.observacao}`, 10, 20);
-
-      doc.save(`Ficha_${data.nome}.pdf`);
+      doc.text(`Paciente: ${dados.nome}\nIdade: ${dados.idade}\nSexo: ${dados.sexo}\nPeso: ${dados.peso} kg\nAltura: ${dados.altura} cm\nIMC: ${imc}\nCintura: ${dados.cintura} cm\nTórax: ${dados.torax} cm\nBíceps D: ${dados.biceps_d} cm\nBíceps E: ${dados.biceps_e} cm\nFrequência Cardíaca: ${dados.fc}\nPressão Arterial: ${dados.pa}\nObservação: ${dados.observacao}`, 10, 20);
+      doc.save(`Ficha_${dados.nome}.pdf`);
 
       const pdfBase64 = btoa(doc.output());
       fetch(GAS_URL, {
         method: "POST",
         body: JSON.stringify({
-          nomePaciente: data.nome,
+          nomePaciente: dados.nome,
           semana: new Date().toISOString().split('T')[0],
           pdfBase64,
           folderId: DRIVE_FOLDER_ID
@@ -93,9 +120,11 @@
       });
 
       const msg = `*Ficha de Emagrecimento*%0A
-Nome: ${data.nome}%0ASexo: ${data.sexo}%0AIdade: ${data.idade}%0APeso: ${data.peso} kg%0AAltura: ${data.altura} cm%0AIMC: ${imc}%0ACintura: ${data.cintura} cm%0ATórax: ${data.torax} cm%0ABíceps D: ${data.biceps_d} cm%0ABíceps E: ${data.biceps_e} cm`;
+Nome: ${dados.nome}%0ASexo: ${dados.sexo}%0AIdade: ${dados.idade}%0APeso: ${dados.peso} kg%0AAltura: ${dados.altura} cm%0AIMC: ${imc}%0ACintura: ${dados.cintura} cm%0ATórax: ${dados.torax} cm%0ABíceps D: ${dados.biceps_d} cm%0ABíceps E: ${dados.biceps_e} cm%0AFC: ${dados.fc}%0APA: ${dados.pa}`;
       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
     }
   </script>
 </body>
 </html>
+
+
