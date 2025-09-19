@@ -67,13 +67,10 @@
     <button type="button" onclick="gerarResumo()">Finalizar Consulta</button>
   </form>  <div id="resumo" style="display:none;"></div>
   <div id="acoes" style="display:none;">
-    <button onclick="baixarPDF(true)">Baixar PDF</button>
-    <button onclick="enviarGoogleDrive()">Salvar no Drive</button>
+    <button onclick="baixarPDF()">Baixar PDF</button>
     <button onclick="enviarWhatsApp()">Enviar por WhatsApp</button>
   </div>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <script>
     const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAgAElEQVR4n...";
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbz726bRq3cHtWOn4473KzD--dpj4Soih8FKgZVKmSi4oCJxHMjvfHYWmuWReh2RCfCYsQ/exec";
-    const DRIVE_FOLDER_ID = "1-ZLwdv_thQtBe2JBc_f90P2x0nOmI4UU";
     let dados = {};
 
     function gerarResumo() {
@@ -103,7 +100,7 @@
       document.getElementById('acoes').style.display = 'flex';
     }
 
-    async function gerarPDF() {
+    async function baixarPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       const alturaM = parseFloat(dados.altura) / 100;
@@ -112,8 +109,8 @@
       const logo = new Image();
       logo.src = LOGO_BASE64;
       await new Promise(resolve => { logo.onload = resolve; });
+      doc.addImage(logo, 'PNG', 30, 40, 150, 150);
 
-      doc.addImage(logo, 'PNG', 15, 30, 180, 180);
       doc.setFontSize(12);
       doc.text(`Paciente: ${dados.nome}
 Idade: ${dados.idade}
@@ -127,54 +124,29 @@ Bíceps Direito: ${dados.biceps_d} cm
 Bíceps Esquerdo: ${dados.biceps_e} cm
 Frequência Cardíaca: ${dados.fc}
 Pressão Arterial: ${dados.pa}
-Observação: ${dados.observacao}`, 10, 220);
+Observação: ${dados.observacao}`, 15, 220);
 
-      return doc;
-    }
-
-    async function baixarPDF(imprimirDireto = false) {
-      if (!dados || !dados.nome) {
-        alert("Gere o resumo antes de salvar o PDF.");
-        return;
-      }
-      const doc = await gerarPDF();
-      if (imprimirDireto) {
-        const blob = doc.output('bloburl');
-        const win = window.open(blob);
-        win.onload = () => win.print();
-      } else {
-        doc.save(`Ficha_${dados.nome}.pdf`);
-      }
-    }
-
-    async function enviarGoogleDrive() {
-      if (!dados || !dados.nome) {
-        alert("Gere o resumo antes de salvar no Drive.");
-        return;
-      }
-      const doc = await gerarPDF();
-      const pdfBase64 = btoa(doc.output());
-      fetch(GAS_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          nomePaciente: dados.nome,
-          semana: new Date().toISOString().split('T')[0],
-          pdfBase64,
-          folderId: DRIVE_FOLDER_ID
-        })
-      }).then(() => alert("Enviado para o Google Drive!"));
+      doc.save(`Ficha_${dados.nome}.pdf`);
     }
 
     function enviarWhatsApp() {
-      if (!dados || !dados.nome) {
-        alert("Gere o resumo antes de enviar pelo WhatsApp.");
-        return;
-      }
       const alturaM = parseFloat(dados.altura) / 100;
       const imc = (dados.peso && alturaM) ? (dados.peso / (alturaM * alturaM)).toFixed(2) : "-";
-      const texto = `*Ficha de Acompanhamento*%0A
-Nome: ${dados.nome}%0ASexo: ${dados.sexo}%0AIdade: ${dados.idade}%0APeso: ${dados.peso} kg%0AAltura: ${dados.altura} cm%0AIMC: ${imc}%0ACintura: ${dados.cintura} cm%0ATórax: ${dados.torax} cm%0ABíceps D: ${dados.biceps_d} cm%0ABíceps E: ${dados.biceps_e} cm%0AFC: ${dados.fc}%0APA: ${dados.pa}`;
-      window.open(`https://wa.me/?text=${texto}`);
+      const texto = `*Ficha de Acompanhamento*%0A` +
+        `Nome: ${dados.nome}%0A` +
+        `Sexo: ${dados.sexo}%0A` +
+        `Idade: ${dados.idade}%0A` +
+        `Peso: ${dados.peso} kg%0A` +
+        `Altura: ${dados.altura} cm%0A` +
+        `IMC: ${imc}%0A` +
+        `Cintura: ${dados.cintura} cm%0A` +
+        `Tórax: ${dados.torax} cm%0A` +
+        `Bíceps Direito: ${dados.biceps_d} cm%0A` +
+        `Bíceps Esquerdo: ${dados.biceps_e} cm%0A` +
+        `FC: ${dados.fc}%0A` +
+        `PA: ${dados.pa}`;
+
+      window.open(`https://wa.me/?text=${texto}`, '_blank');
     }
   </script></body>
-</html>      
+</html>
