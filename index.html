@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!DOCTYPE html><html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -71,24 +70,78 @@
     <label>Observação:</label><textarea name="observacao"></textarea>
     <label>Foto do paciente:</label><input type="file" accept="image/*" id="fotoPaciente">
     <button type="button" onclick="gerarResumo()">✅ Finalizar Consulta</button>
-  </form>
-
-  <div id="resumo" style="display:none;"></div>
+  </form>  <div id="resumo" style="display:none;"></div>
   <div id="acoes" style="display:none;">
-    <button onclick="baixarPDF()">📄 Baixar PDF</button>
+    <button onclick="baixarPDF(true)">📄 Baixar PDF</button>
     <button onclick="salvarNoDrive()">💾 Salvar no Drive</button>
     <button onclick="enviarWhatsApp()">📲 Enviar por WhatsApp</button>
   </div>
-  <div id="mensagemStatus"></div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
+  <div id="mensagemStatus"></div>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <script>
     const { jsPDF } = window.jspdf;
-    const LOGO_BASE64 = "data:image/png;base64,..."; // coloque sua logo aqui
-    const GAS_URL = "https://script.google.com/macros/library/d/1UyUjwKktzXgKfOqGNmuPScJ62j5zzddJlRjTjalq__ixlVy_VkT_Obya/1";
+    const LOGO_BASE64 = "data:image/png;base64,...";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycb2726bRg3cHEW0n4473k2D-dpj4Soh8FKgZVKmSi4oCsJxHMjrfHVYWmuWReh2/exec";
     const DRIVE_FOLDER_ID = "1-ZLwdv_thQtBe2JBc_f90P2x0nOmI4UU";
 
-    // (restante do código permanece igual)
-  </script>
-</body>
+    function gerarResumo() {
+      const form = document.forms['formulario'];
+      const dados = Object.fromEntries(new FormData(form));
+      const imc = (dados.peso / ((dados.altura / 100) ** 2)).toFixed(2);
+      const resumoHTML = `
+        <h3>Resumo da Consulta</h3>
+        <p><strong>Nome:</strong> ${dados.nome}</p>
+        <p><strong>Idade:</strong> ${dados.idade} anos</p>
+        <p><strong>Peso:</strong> ${dados.peso} kg</p>
+        <p><strong>Altura:</strong> ${dados.altura} cm</p>
+        <p><strong>IMC:</strong> ${imc}</p>
+        <p><strong>Pressão Arterial:</strong> ${dados.pa}</p>
+        <p><strong>Próxima consulta:</strong> ${dados.proxima}</p>
+      `;
+      document.getElementById("resumo").innerHTML = resumoHTML;
+      document.getElementById("resumo").style.display = "block";
+      document.getElementById("acoes").style.display = "flex";
+    }
+
+    function baixarPDF(printAfter = false) {
+      const doc = new jsPDF();
+      doc.setFontSize(16);
+      doc.text("Resumo da Consulta", 20, 20);
+      doc.setFontSize(12);
+      doc.text(document.getElementById("resumo").innerText, 20, 30);
+      if (printAfter) {
+        window.open(doc.output("bloburl"), '_blank');
+      } else {
+        doc.save("resumo_consulta.pdf");
+      }
+    }
+
+    function salvarNoDrive() {
+      const doc = new jsPDF();
+      doc.text(document.getElementById("resumo").innerText, 20, 20);
+      const pdfBlob = doc.output("datauristring");
+      const base64 = pdfBlob.split(",")[1];
+      const nomePaciente = document.forms['formulario']['nome'].value;
+      const semana = new Date().toISOString().split('T')[0];
+      const nomeArquivo = `${nomePaciente}_consulta.pdf`;
+      const payload = {
+        contents: JSON.stringify({ nomePaciente, semana, nomeArquivo, base64pdf: base64 })
+      };
+      fetch(GAS_URL, {
+        method: "POST",
+        body: new URLSearchParams(payload),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" }
+      })
+        .then(r => r.text())
+        .then(res => document.getElementById("mensagemStatus").innerText = res)
+        .catch(err => document.getElementById("mensagemStatus").innerText = "Erro: " + err);
+    }
+
+    function enviarWhatsApp() {
+      const form = document.forms['formulario'];
+      const dados = Object.fromEntries(new FormData(form));
+      const mensagem = `Ficha de Consulta:\nNome: ${dados.nome}\nIdade: ${dados.idade}\nPeso: ${dados.peso} kg\nAltura: ${dados.altura} cm\nIMC: ${(dados.peso / ((dados.altura / 100) ** 2)).toFixed(2)}\nPA: ${dados.pa}\nPróxima: ${dados.proxima}`;
+      const url = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+      window.open(url, '_blank');
+    }
+  </script></body>
 </html>
+
