@@ -43,6 +43,10 @@
     @media (min-width: 600px) {
       #acoes { flex-direction: row; }
     }
+    #graficoPeso {
+      background: white; padding: 20px; border-radius: 10px;
+      margin-top: 30px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
   </style>
 </head>
 <body>
@@ -72,7 +76,11 @@
     <button onclick="baixarPDF()">📄 Baixar PDF</button>
     <button onclick="salvarNoDrive()">💾 Salvar no Drive</button>
     <button onclick="enviarWhatsApp()">📲 Enviar por WhatsApp</button>
-  </div>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <script>
+  </div>
+  <div id="graficoPeso" style="display:none;">
+    <h3>📈 Evolução do Peso e IMC</h3>
+    <canvas id="pesoChart"></canvas>
+  </div>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <script>
     const { jsPDF } = window.jspdf;
     const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAgAElEQVR4n...";
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzZRijSZa6XgMi_C4pHlKMIUc0oNmK2NKo3iNe9ensZlxUuXIxezfORCEb6Aw0yOjzq/exec";
@@ -80,12 +88,11 @@
 
     let dados = {};
     let fotoBase64 = "";
+    const historico = JSON.parse(localStorage.getItem("historicoPeso")) || [];
 
     document.getElementById('fotoPaciente').addEventListener('change', function (e) {
       const reader = new FileReader();
-      reader.onload = function () {
-        fotoBase64 = reader.result;
-      };
+      reader.onload = function () { fotoBase64 = reader.result; };
       reader.readAsDataURL(e.target.files[0]);
     });
 
@@ -94,6 +101,10 @@
       dados = Object.fromEntries(new FormData(form));
       const alturaM = parseFloat(dados.altura) / 100;
       const imc = (dados.peso && alturaM) ? (dados.peso / (alturaM * alturaM)).toFixed(2) : "-";
+
+      historico.push({ data: new Date().toLocaleDateString(), peso: parseFloat(dados.peso), imc: parseFloat(imc) });
+      localStorage.setItem("historicoPeso", JSON.stringify(historico));
+
       const resumo = `
         <h3>📝 Resumo da Consulta</h3>
         <p><strong>Nome:</strong> ${dados.nome} | <strong>Sexo:</strong> ${dados.sexo} | <strong>Idade:</strong> ${dados.idade}</p>
@@ -104,9 +115,11 @@
         <p><strong>Próxima Consulta:</strong> ${dados.proxima}</p>
         <p><strong>Observação:</strong> ${dados.observacao}</p>
       `;
+
       document.getElementById('resumo').innerHTML = resumo;
       document.getElementById('resumo').style.display = 'block';
       document.getElementById('acoes').style.display = 'flex';
+      renderizarGrafico();
     }
 
     async function gerarPDF() {
@@ -182,6 +195,42 @@ Observação: ${dados.observacao}`, 10, 140);
         `PA: ${dados.pa}%0A` +
         `📅 Próxima consulta: ${dados.proxima}`;
       window.open(`https://wa.me/?text=${texto}`, '_blank');
+    }
+
+    function renderizarGrafico() {
+      const graficoDiv = document.getElementById('graficoPeso');
+      const canvas = document.getElementById('pesoChart');
+      const labels = historico.map(h => h.data);
+      const pesos = historico.map(h => h.peso);
+      const imcs = historico.map(h => h.imc);
+
+      new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Peso (kg)',
+              data: pesos,
+              borderColor: '#007b5f',
+              tension: 0.3,
+              fill: false
+            },
+            {
+              label: 'IMC',
+              data: imcs,
+              borderColor: '#f39c12',
+              tension: 0.3,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+      graficoDiv.style.display = 'block';
     }
   </script></body>
 </html>
