@@ -1,164 +1,80 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prontuário Emagrecimento</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-      margin: 0; padding: 20px; background-color: #f2f2f2; color: #333;
-    }
-    h2 {
-      text-align: center; color: #007b5f;
-    }
-    form {
-      background-color: #fff; padding: 20px; border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    label {
-      margin-top: 10px; display: block; font-weight: bold;
-    }
-    input, select, textarea {
-      width: 100%; padding: 10px; margin-top: 5px;
-      border-radius: 8px; border: 1px solid #ccc; font-size: 1em;
-    }
-    button {
-      padding: 12px 20px; margin: 15px 5px 0 0;
-      background-color: #007b5f; color: white; border: none;
-      border-radius: 8px; font-size: 1em; cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #005f49;
-    }
-    #resumo {
-      background-color: white; padding: 20px;
-      border-radius: 10px; margin-top: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-    #acoes {
-      display: flex; flex-direction: column; gap: 10px; margin-top: 15px;
-    }
-    #mensagemStatus {
-      margin-top: 10px; font-weight: bold;
-    }
-    @media (min-width: 600px) {
-      #acoes { flex-direction: row; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prontuário Emagrecimento</title>
+<style>
+* { box-sizing: border-box; }
+body {
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+margin: 0; padding: 20px; background-color: #f2f2f2; color: #333;
+}
+h2 {
+text-align: center; color: #007b5f;
+}
+form {
+background-color: #fff; padding: 20px; border-radius: 10px;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+label {
+margin-top: 10px; display: block; font-weight: bold;
+}
+input, select, textarea {
+width: 100%; padding: 10px; margin-top: 5px;
+border-radius: 8px; border: 1px solid #ccc; font-size: 1em;
+}
+button {
+padding: 12px 20px; margin: 15px 5px 0 0;
+background-color: #007b5f; color: white; border: none;
+border-radius: 8px; font-size: 1em; cursor: pointer;
+transition: background-color 0.3s ease;
+}
+button:hover {
+background-color: #005f49;
+}
+#resumo {
+background-color: white; padding: 20px;
+border-radius: 10px; margin-top: 20px;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+#acoes {
+display: flex; flex-direction: column; gap: 10px; margin-top: 15px;
+}
+#mensagemStatus {
+margin-top: 10px; font-weight: bold;
+}
+@media (min-width: 600px) {
+#acoes { flex-direction: row; }
+}
+</style>
 </head>
 <body>
-  <h2>📋 Ficha de Acompanhamento - Emagrecimento</h2>
-  <form id="formulario">
-    <label>Nome:</label><input type="text" name="nome">
-    <label>Sexo:</label>
-    <select name="sexo">
-      <option value="masculino">Masculino</option>
-      <option value="feminino">Feminino</option>
-    </select>
-    <label>Idade:</label><input type="number" name="idade">
-    <label>Peso (kg):</label><input type="number" step="0.1" name="peso">
-    <label>Altura (cm):</label><input type="number" step="0.1" name="altura">
-    <label>Cintura (cm):</label><input type="number" name="cintura">
-    <label>Tórax (cm):</label><input type="number" name="torax">
-    <label>Bíceps Direito (cm):</label><input type="number" name="biceps_d">
-    <label>Bíceps Esquerdo (cm):</label><input type="number" name="biceps_e">
-    <label>Frequência Cardíaca:</label><input type="number" name="fc">
-    <label>Pressão Arterial:</label><input type="text" name="pa">
-    <label>Data da próxima consulta:</label><input type="date" name="proxima">
-    <label>Observação:</label><textarea name="observacao"></textarea>
-    <label>Foto do paciente:</label><input type="file" accept="image/*" id="fotoPaciente">
-    <button type="button" onclick="gerarResumo()">✅ Finalizar Consulta</button>
-  </form>
+<h2>📋 Ficha de Acompanhamento - Emagrecimento</h2>
+<form id="formulario">
+<label>Nome:</label><input type="text" name="nome">
+<label>Sexo:</label>
+<select name="sexo">
+<option value="masculino">Masculino</option>
+<option value="feminino">Feminino</option>
+</select>
+<label>Idade:</label><input type="number" name="idade">
+<label>Peso (kg):</label><input type="number" step="0.1" name="peso">
+<label>Altura (cm):</label><input type="number" step="0.1" name="altura">
+<label>Cintura (cm):</label><input type="number" name="cintura">
+<label>Tórax (cm):</label><input type="number" name="torax">
+<label>Bíceps Direito (cm):</label><input type="number" name="biceps_d">
+<label>Bíceps Esquerdo (cm):</label><input type="number" name="biceps_e">
+<label>Frequência Cardíaca:</label><input type="number" name="fc">
+<label>Pressão Arterial:</label><input type="text" name="pa">
+<label>Data da próxima consulta:</label><input type="date" name="proxima">
+<label>Observação:</label><textarea name="observacao"></textarea>
+<label>Foto do paciente:</label><input type="file" accept="image/*" id="fotoPaciente">
+<button type="button" onclick="gerarResumo()">✅ Finalizar Consulta</button>
+</form>
 
-  <div id="resumo" style="display:none;"></div>
-  <div id="acoes" style="display:none;">
-    <button onclick="baixarPDF(true)">📄 Baixar PDF</button>
-    <button onclick="salvarNoDrive()">💾 Salvar no Drive</button>
-    <button onclick="enviarWhatsApp()">📲 Enviar por WhatsApp</button>
-  </div>
-  <div id="mensagemStatus"></div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
-    const { jsPDF } = window.jspdf;
-    const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAANPklEQVR4nO3Ze5RV1X0H8O/vt/c598..."; // completo no seu uso real
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbz726bRq3cHtWOn4473KzD--dpj4Soih8FKgZVKmSi4oCJxHMjvfHYWmuWReh2RCfCYsQ/exec";
-    const DRIVE_FOLDER_ID = "1-ZLwdv_thQtBe2JBc_f90P2x0nOmI4UU";
-
-    function gerarResumo() {
-      const form = document.forms['formulario'];
-      const dados = Object.fromEntries(new FormData(form));
-      const imc = (dados.peso / ((dados.altura / 100) ** 2)).toFixed(2);
-      const resumoHTML = `
-        <h3>Resumo da Consulta</h3>
-        <p><strong>Nome:</strong> ${dados.nome}</p>
-        <p><strong>Idade:</strong> ${dados.idade} anos</p>
-        <p><strong>Peso:</strong> ${dados.peso} kg</p>
-        <p><strong>Altura:</strong> ${dados.altura} cm</p>
-        <p><strong>IMC:</strong> ${imc}</p>
-        <p><strong>Pressão Arterial:</strong> ${dados.pa}</p>
-        <p><strong>Próxima consulta:</strong> ${dados.proxima}</p>
-      `;
-      document.getElementById("resumo").innerHTML = resumoHTML;
-      document.getElementById("resumo").style.display = "block";
-      document.getElementById("acoes").style.display = "flex";
-    }
-
-    function baixarPDF(printAfter = false) {
-      const doc = new jsPDF();
-      const imgProps = doc.getImageProperties(LOGO_BASE64);
-      const pdfWidth = doc.internal.pageSize.getWidth();
-      const imgWidth = 50;
-      const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-
-      doc.addImage(LOGO_BASE64, 'PNG', (pdfWidth - imgWidth) / 2, 10, imgWidth, imgHeight);
-      doc.setFontSize(16);
-      doc.text("Resumo da Consulta", pdfWidth / 2, 30 + imgHeight, { align: "center" });
-      doc.setFontSize(12);
-      const texto = document.getElementById("resumo").innerText;
-      const linhas = doc.splitTextToSize(texto, 170);
-      doc.text(linhas, 20, 40 + imgHeight);
-
-      if (printAfter) {
-        window.open(doc.output("bloburl"), '_blank');
-      } else {
-        doc.save("resumo_consulta.pdf");
-      }
-    }
-
-    function salvarNoDrive() {
-      const doc = new jsPDF();
-      const texto = document.getElementById("resumo").innerText;
-      const linhas = doc.splitTextToSize(texto, 170);
-      doc.text(linhas, 20, 30);
-      const pdfBlob = doc.output("datauristring");
-      const base64 = pdfBlob.split(",")[1];
-      const nomePaciente = document.forms['formulario']['nome'].value;
-      const semana = new Date().toISOString().split('T')[0];
-      const nomeArquivo = `${nomePaciente}_consulta.pdf`;
-      const payload = {
-        contents: JSON.stringify({ nomePaciente, semana, nomeArquivo, base64pdf: base64, folderId: DRIVE_FOLDER_ID })
-      };
-      fetch(GAS_URL, {
-        method: "POST",
-        body: new URLSearchParams(payload),
-        headers: { "Content-Type": "application/x-www-form-urlencoded" }
-      })
-      .then(r => r.text())
-      .then(res => document.getElementById("mensagemStatus").innerText = res)
-      .catch(err => document.getElementById("mensagemStatus").innerText = "Erro: " + err);
-    }
-
-    function enviarWhatsApp() {
-      const form = document.forms['formulario'];
-      const dados = Object.fromEntries(new FormData(form));
-      const mensagem = `Ficha de Consulta:\nNome: ${dados.nome}\nIdade: ${dados.idade}\nPeso: ${dados.peso} kg\nAltura: ${dados.altura} cm\nIMC: ${(dados.peso / ((dados.altura / 100) ** 2)).toFixed(2)}\nPA: ${dados.pa}\nPróxima: ${dados.proxima}`;
-      const url = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
-      window.open(url, '_blank');
-    }
-  </script>
-</body>
+<div id="resumo" style="display:none;"></div>
+<div id="acoes" style="display:none;">
 </html>
+
