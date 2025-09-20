@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!DOCTYPE html><html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -74,8 +73,8 @@
   </form>
   <div id="resumo" style="display:none;"></div>
   <div id="acoes" style="display:none;">
-    <button onclick="baixarPDF(false)">📄 Baixar PDF</button>
-    <button onclick="salvarNoDrive()">📏 Salvar no Drive</button>
+    <button onclick="baixarPDF(true)">📄 Baixar PDF</button>
+    <button onclick="salvarNoDrive()">💾 Salvar no Drive</button>
     <button onclick="enviarWhatsApp()">📲 Enviar por WhatsApp</button>
   </div>
   <div id="mensagemStatus"></div>
@@ -83,7 +82,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     const { jsPDF } = window.jspdf;
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzMKXK_Tw2hwd6C3zFodvHoqKbEon7RHiROzH-p4wtL/dev";
+    const LOGO_BASE64 = "data:image/png;base64,...";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbz726bRq3cHtWOn4473KzD--dpj4Soih8FKgZVKmSi4oCJxHMjvfHYWmuWReh2RCfCYsQ/exec";
     const DRIVE_FOLDER_ID = "1-ZLwdv_thQtBe2JBc_f90P2x0nOmI4UU";
 
     function gerarResumo() {
@@ -107,9 +107,10 @@
 
     function baixarPDF(printAfter = false) {
       const doc = new jsPDF();
-      const texto = document.getElementById("resumo").innerText;
+      doc.setFontSize(16);
+      doc.text("Resumo da Consulta", 20, 20);
       doc.setFontSize(12);
-      doc.text(texto, 20, 30);
+      doc.text(document.getElementById("resumo").innerText, 20, 30);
       if (printAfter) {
         window.open(doc.output("bloburl"), '_blank');
       } else {
@@ -119,14 +120,14 @@
 
     function salvarNoDrive() {
       const doc = new jsPDF();
-      const texto = document.getElementById("resumo").innerText;
-      doc.text(texto, 20, 30);
-      const base64 = doc.output("datauristring").split(",")[1];
+      doc.text(document.getElementById("resumo").innerText, 20, 20);
+      const pdfBlob = doc.output("datauristring");
+      const base64 = pdfBlob.split(",")[1];
       const nomePaciente = document.forms['formulario']['nome'].value;
       const semana = new Date().toISOString().split('T')[0];
-      const nomeArquivo = `${nomePaciente}_consulta.pdf`;
+      const nomeArquivo = `${nomePaciente}_consulta_${semana}.pdf`;
       const payload = {
-        contents: JSON.stringify({ nomePaciente, semana, nomeArquivo, base64pdf: base64, folderId: DRIVE_FOLDER_ID })
+        contents: JSON.stringify({ nomePaciente, semana, nomeArquivo, base64Apdf: base64, folderId: DRIVE_FOLDER_ID })
       };
       fetch(GAS_URL, {
         method: "POST",
@@ -148,5 +149,6 @@
   </script>
 </body>
 </html>
+
 
 
